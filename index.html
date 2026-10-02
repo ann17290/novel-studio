@@ -3,204 +3,289 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ห้องทำงานนักเขียน & จัดรูปเล่ม (Writer Studio Deluxe)</title>
+  <title>สตูดิโอนักเขียน - Novel Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f8fafc;
-      --panel: #ffffff;
-      --border: #e2e8f0;
-      --text: #1e293b;
-      --subtext: #64748b;
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --bg-page: #f1f5f9;
+      --surface: #ffffff;
+      --border: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
       --danger: #ef4444;
       --warning: #f59e0b;
       --success: #10b981;
+      --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+      --editor-font-size: 20px; /* ขนาดตัวอักษรเริ่มต้นที่ใหญ่ขึ้น */
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Sarabun', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
       display: flex;
+      flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* เมนูหลักฝั่งซ้าย */
-    nav {
-      width: 210px;
-      background: #0f172a;
-      color: #94a3b8;
-      display: flex;
-      flex-direction: column;
-      padding: 18px 10px;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-    nav h2 {
-      color: #fff;
-      font-size: 15px;
-      margin-bottom: 16px;
-      padding-left: 8px;
-    }
-    nav button {
-      background: transparent;
-      border: none;
-      color: inherit;
-      padding: 9px 12px;
-      border-radius: 6px;
-      text-align: left;
-      font-size: 13px;
-      cursor: pointer;
+    /* 1. Header บาร์ด้านบน */
+    header {
+      height: 64px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 20;
+      flex-shrink: 0;
     }
-    nav button:hover, nav button.active {
-      background: #1e293b;
-      color: #38bdf8;
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      font-weight: 700;
+      font-size: 19px;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .novel-badge-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-left: 2px solid var(--border);
+      padding-left: 12px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .font-size-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-page);
+      padding: 3px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-right: 6px;
+    }
+    .font-size-controls span {
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 44px;
+      text-align: center;
     }
 
-    /* พื้นที่ทำงาน */
-    .workspace { flex: 1; display: flex; overflow: hidden; }
-    .view-section { display: none; flex: 1; height: 100%; }
-    .view-section.active { display: flex; }
-
-    /* ฟอร์มและปุ่ม */
-    input, textarea {
+    /* ปุ่มมาตรฐาน */
+    .btn {
       font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-main);
+    }
+    .btn:hover { background: #f8fafc; }
+    .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-sm { padding: 5px 10px; font-size: 13px; }
+    .btn-icon { width: 34px; height: 34px; padding: 0; }
+
+    /* 2. พื้นที่โครงสร้างแอป 3 ส่วน */
+    .app-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* คอลัมน์ซ้าย (Sidebar) */
+    aside.sidebar {
+      width: 290px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: margin-left 0.25s ease, width 0.25s ease;
+    }
+    aside.sidebar.collapsed {
+      margin-left: -290px;
+    }
+
+    .sidebar-header {
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+    }
+    .sidebar-tab-btn {
+      flex: 1;
+      padding: 11px 4px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .sidebar-tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: var(--surface);
+    }
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+    }
+    .list-item {
+      padding: 11px 14px;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      font-size: 15px;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.1s ease;
+    }
+    .list-item:hover { background: #f8fafc; }
+    .list-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* คอลัมน์กลาง: กระดาษพิมพ์งานตัวใหญ่ */
+    main.main-viewport {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      justify-content: center;
+      padding: 24px 20px;
+      position: relative;
+    }
+
+    /* ปุ่มลอยเปิด Sidebar เวลาถูกซ่อน */
+    .toggle-floating-btn {
+      position: absolute;
+      top: 16px;
+      z-index: 10;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 8px 12px;
-      outline: none;
-      background: #fff;
-      color: var(--text);
-    }
-    input:focus, textarea:focus { border-color: var(--primary); }
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
+      box-shadow: var(--shadow-sm);
+      padding: 6px 10px;
       cursor: pointer;
       font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 5px;
     }
-    .btn:hover { background: var(--primary-hover); }
-    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    .toggle-floating-btn.visible { display: inline-flex; }
+    #btn-open-left { left: 16px; }
+    #btn-open-right { right: 16px; }
 
-    /* แท็บ 1: ทรีทเมนต์ */
-    #view-treatment {
-      padding: 30px 40px;
-      overflow-y: auto;
-      flex-direction: column;
-      gap: 16px;
+    /* กระดาษพิมพ์ */
+    .paper-canvas {
+      width: 100%;
       max-width: 900px;
-      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      min-height: 85vh;
+      overflow: hidden;
+    }
+    .chapter-header-box {
+      padding: 26px 36px 16px 36px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .input-title {
+      font-size: 26px; /* หัวข้อใหญ่สะดุดตา */
+      font-weight: 700;
+      border: none;
+      outline: none;
+      width: 100%;
+      color: var(--text-main);
+    }
+    .input-goal {
+      font-size: 15px;
+      color: var(--text-muted);
+      border: none;
+      outline: none;
       width: 100%;
     }
-    .card {
-      background: var(--panel);
-      padding: 16px 20px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .card label { font-weight: bold; font-size: 13px; color: var(--subtext); }
-
-    /* แท็บ 2: ตัวละคร */
-    #view-characters { display: flex; width: 100%; }
-    .char-sidebar {
-      width: 240px;
-      background: var(--panel);
-      border-right: 1px solid var(--border);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .char-list { list-style: none; overflow-y: auto; flex: 1; }
-    .char-item {
-      padding: 9px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 4px;
-      background: #f1f5f9;
-      font-size: 14px;
-    }
-    .char-item.active { background: #e0e7ff; font-weight: bold; color: var(--primary); }
-    .char-form {
+    .writing-editor {
       flex: 1;
-      padding: 30px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      max-width: 700px;
-    }
-
-    /* แท็บ 3: ฉากและตัวช่วยวิเคราะห์ */
-    #view-scenes { display: flex; width: 100%; }
-    .scene-sidebar {
-      width: 220px;
-      background: var(--panel);
-      border-right: 1px solid var(--border);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .scene-list { list-style: none; overflow-y: auto; flex: 1; }
-    .scene-item {
-      padding: 9px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 5px;
-      background: #f1f5f9;
-      font-size: 13px;
-    }
-    .scene-item.active { background: #e2e8f0; font-weight: bold; }
-    .editor-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 30px;
-      gap: 12px;
-      background: var(--bg);
-    }
-    .editor-container textarea#scene-text {
-      flex: 1;
+      padding: 36px;
+      border: none;
+      outline: none;
       resize: none;
-      line-height: 1.8;
-      font-size: 15px;
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 8px;
+      font-size: var(--editor-font-size); /* ตัวหนังสือใหญ่ขึ้นตามขนาดที่ปรับ */
+      line-height: 2.1;
+      color: #1e293b;
+      font-family: inherit;
     }
 
-    .inspector-panel {
-      width: 310px;
-      background: var(--panel);
+    /* คอลัมน์ขวา: ผู้ช่วยตรวจงาน */
+    aside.assistant-drawer {
+      width: 330px;
+      background: var(--surface);
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
+      transition: margin-right 0.25s ease, width 0.25s ease;
     }
-    .inspector-header {
-      padding: 14px 16px;
-      font-size: 14px;
-      font-weight: bold;
+    aside.assistant-drawer.collapsed {
+      margin-right: -330px;
+    }
+
+    .drawer-header {
+      padding: 14px 18px;
       border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .inspector-body {
+    .drawer-body {
       padding: 16px;
       overflow-y: auto;
       flex: 1;
@@ -208,574 +293,566 @@
       flex-direction: column;
       gap: 16px;
     }
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat-card { background: #f8fafc; border: 1px solid var(--border); padding: 8px 10px; border-radius: 6px; }
-    .stat-card .num { font-size: 15px; font-weight: bold; color: var(--primary); }
-    .stat-card .lbl { font-size: 11px; color: var(--subtext); }
-    .issue-card {
-      background: #fdfdfe;
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .metric-card {
+      background: var(--bg-page);
+      padding: 10px 12px;
+      border-radius: 8px;
       border: 1px solid var(--border);
-      border-left: 3px solid var(--primary);
-      padding: 8px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
     }
-    .issue-card.err { border-left-color: var(--danger); }
-    .issue-card.warn { border-left-color: var(--warning); }
-    .issue-card .desc { color: var(--subtext); font-size: 11px; }
+    .metric-val { font-size: 18px; font-weight: 700; color: var(--primary); }
+    .metric-lbl { font-size: 12px; color: var(--text-muted); }
 
-    /* แท็บ 4: ระบบจัดรูปเล่มหนังสือ (Book Typesetting Layout) */
-    #view-book {
-      flex-direction: column;
-      overflow-y: auto;
-      background: #525659; /* สีพื้นหลังเหมือน PDF viewer */
-      padding: 30px 10px;
-      align-items: center;
-      gap: 24px;
-    }
-    .book-controls {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: #1e293b;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
+    .check-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
       display: flex;
-      gap: 15px;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      flex-direction: column;
+      gap: 6px;
+      border-left: 3px solid var(--primary);
     }
-    
-    /* หน้ากระดาษจำลอง A5 */
-    .book-page {
+    .check-card.err { border-left-color: var(--danger); }
+    .check-card.warn { border-left-color: var(--warning); }
+
+    /* โมดัลรูปเล่ม */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #334155;
+      width: 90vw;
+      height: 90vh;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .print-page {
       background: #fff;
       width: 148mm;
       min-height: 210mm;
-      padding: 24mm 20mm 20mm 22mm;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      color: #1a1a1a;
-      position: relative;
-      display: flex;
-      flex-direction: column;
+      padding: 24mm 20mm;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      font-size: 13pt;
       line-height: 1.8;
-      font-size: 13.5pt;
+      color: #111;
     }
 
-    /* องค์ประกอบต่างๆ ในเล่ม */
-    .book-cover {
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      border: 1px solid #ddd;
-    }
-    .book-cover h1 { font-size: 26pt; margin-bottom: 12px; color: #0f172a; line-height: 1.3; }
-    .book-cover .author-tag { font-size: 16pt; color: #475569; margin-top: 40px; }
-    .book-cover .premise-tag { font-size: 12pt; color: #64748b; font-style: italic; max-width: 80%; margin-top: 15px; }
-
-    .book-halftitle {
-      justify-content: space-between;
-      text-align: center;
-    }
-    .book-copyright-footer {
-      font-size: 9pt;
-      line-height: 1.6;
-      color: #64748b;
-      text-align: left;
-    }
-
-    .book-toc-title, .book-author-title {
-      font-size: 18pt;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 25px;
-    }
-    .book-toc-item {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px dotted #cbd5e1;
-      padding: 8px 0;
-      font-size: 12pt;
-    }
-
-    .book-chapter-title {
-      font-size: 18pt;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 15mm;
-      margin-bottom: 8mm;
-    }
-    .book-paragraph {
-      text-indent: 1.5cm;
-      margin-bottom: 6px;
-      text-align: justify;
-    }
-
-    /* การตั้งค่าสั่งพิมพ์ (Print to PDF) */
     @media print {
-      body { background: transparent; }
-      nav, .book-controls, .char-sidebar, .scene-sidebar, .inspector-panel, .card { display: none !important; }
-      .workspace { overflow: visible !important; height: auto !important; }
-      #view-book {
-        display: block !important;
-        background: transparent !important;
-        padding: 0 !important;
-        overflow: visible !important;
-      }
-      .book-page {
-        box-shadow: none !important;
-        margin: 0 !important;
-        width: 100% !important;
-        min-height: 100vh !important;
-        page-break-before: always;
-      }
-      .book-page:first-child { page-break-before: avoid; }
+      body * { visibility: hidden; }
+      .modal-scroll, .modal-scroll * { visibility: visible; }
+      .modal-scroll { position: absolute; left: 0; top: 0; padding: 0; background: transparent; }
+      .print-page { box-shadow: none; page-break-before: always; margin: 0; }
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <h2>Writer Studio</h2>
-    <button class="active" onclick="switchTab('treatment')">📋 ทรีทเมนต์ / โครงเรื่อง</button>
-    <button onclick="switchTab('characters')">👤 ข้อมูลตัวละคร</button>
-    <button onclick="switchTab('scenes')">✍️ ฉากและเนื้อเรื่อง</button>
-    <button onclick="switchTab('book')">📖 จัดรูปเล่ม & ตัวอย่างพิมพ์</button>
-    <div style="margin-top: auto;">
-      <button onclick="exportBackup()" style="width: 100%; justify-content: center; background: #334155;">💾 สำรองข้อมูล (JSON)</button>
+  <!-- 1. บาร์ด้านบน -->
+  <header>
+    <div class="brand-section">
+      <button class="btn btn-icon btn-sm" title="ซ่อน/แสดงเมนูซ้าย" onclick="toggleLeftSidebar()">☰</button>
+      <a href="#" class="brand-logo">📚 WriterHub</a>
+      <span class="novel-badge-title" id="top-novel-title">ใต้เงาจันทรา</span>
     </div>
-  </nav>
 
-  <div class="workspace">
+    <div class="header-actions">
+      <!-- ปรับขนาดตัวอักษร -->
+      <div class="font-size-controls" title="ปรับขนาดตัวอักษรเนื้อหา">
+        <button class="btn btn-sm btn-icon" onclick="changeFontSize(-2)">A-</button>
+        <span id="font-size-display">20px</span>
+        <button class="btn btn-sm btn-icon" onclick="changeFontSize(2)">A+</button>
+      </div>
+
+      <button class="btn btn-sm" id="btn-focus-mode" onclick="toggleFocusMode()">🎯 โฟกัสเต็มจอ</button>
+      <button class="btn btn-primary btn-sm" onclick="openBookModal()">📖 แสดงรูปเล่ม</button>
+      <button class="btn btn-icon btn-sm" title="ซ่อน/แสดงแถบผู้ช่วยขวา" onclick="toggleRightDrawer()">⚙️</button>
+    </div>
+  </header>
+
+  <!-- 2. พื้นที่ทำงาน 3 คอลัมน์ -->
+  <div class="app-layout">
     
-    <!-- 1. ทรีทเมนต์ และ ข้อมูลนักเขียน -->
-    <section id="view-treatment" class="view-section active">
-      <div class="card">
-        <label>ชื่อเรื่อง (Book Title)</label>
-        <input type="text" id="treat-title" placeholder="ใส่ชื่อนิยาย..." oninput="saveTreatment()">
-      </div>
-      <div class="card">
-        <label>นามปากกา / ชื่อผู้แต่ง (Author Name)</label>
-        <input type="text" id="treat-author" placeholder="เช่น กวินทร์, ดอกไม้ริมทาง..." oninput="saveTreatment()">
-      </div>
-      <div class="card">
-        <label>คำนำนักเขียน / เกี่ยวกับผู้เขียน (Author Note / Foreword)</label>
-        <textarea rows="3" id="treat-author-note" placeholder="ข้อความทักทายผู้อ่าน หรือที่มาของเรื่องนี้..." oninput="saveTreatment()"></textarea>
-      </div>
-      <div class="card">
-        <label>คำโปรยปก / แก่นเรื่อง (Theme & Blurb)</label>
-        <textarea rows="3" id="treat-premise" placeholder="คำโปรยสั้นๆ หลังปก หรือธีมเรื่อง..." oninput="saveTreatment()"></textarea>
-      </div>
-      <div class="card">
-        <label>เรื่องย่อทั้งหมด (Synopsis)</label>
-        <textarea rows="5" id="treat-synopsis" placeholder="ภาพรวมเนื้อหาทั้งหมด..." oninput="saveTreatment()"></textarea>
-      </div>
-    </section>
+    <!-- ปุ่มลอยดึงแถบกลับมาเวลาซ่อน -->
+    <button class="toggle-floating-btn" id="btn-open-left" onclick="toggleLeftSidebar()">▶ สารบัญบท</button>
+    <button class="toggle-floating-btn" id="btn-open-right" onclick="toggleRightDrawer()">◀ ตัวช่วยวิเคราะห์</button>
 
-    <!-- 2. ตัวละคร -->
-    <section id="view-characters" class="view-section">
-      <div class="char-sidebar">
-        <button class="btn" onclick="addCharacter()">+ เพิ่มตัวละคร</button>
-        <ul class="char-list" id="char-list"></ul>
+    <!-- ฝั่งซ้าย: สารบัญ/ตัวละคร/โครงเรื่อง -->
+    <aside class="sidebar" id="left-sidebar">
+      <div class="sidebar-header">
+        <span style="font-weight:600; font-size:14px;">โครงสร้างนิยาย</span>
+        <button class="btn btn-sm" style="border:none; color:var(--text-muted);" onclick="toggleLeftSidebar()">✕ ซ่อน</button>
       </div>
-      <div class="char-form" id="char-form" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 id="char-heading">รายละเอียดตัวละคร</h3>
-          <button class="btn btn-sm" style="background:#ef4444;" onclick="deleteCharacter()">ลบตัวละคร</button>
-        </div>
-        <div>
-          <label style="font-size:12px; color:var(--subtext);">ชื่อตัวละคร:</label>
-          <input type="text" id="char-name" style="width: 100%;" oninput="saveCurrentChar()">
-        </div>
-        <div>
-          <label style="font-size:12px; color:var(--subtext);">บทบาท:</label>
-          <input type="text" id="char-role" style="width: 100%;" oninput="saveCurrentChar()">
-        </div>
-        <div>
-          <label style="font-size:12px; color:var(--subtext);">เป้าหมาย / แรงจูงใจ:</label>
-          <input type="text" id="char-goal" style="width: 100%;" oninput="saveCurrentChar()">
-        </div>
-        <div>
-          <label style="font-size:12px; color:var(--subtext);">นิสัยและเอกลักษณ์:</label>
-          <textarea rows="3" id="char-personality" style="width: 100%;" oninput="saveCurrentChar()"></textarea>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3. ฉากและตัวช่วยตรวจ -->
-    <section id="view-scenes" class="view-section">
-      <div class="scene-sidebar">
-        <button class="btn" onclick="addScene()">+ เพิ่มฉากใหม่</button>
-        <ul class="scene-list" id="scene-list"></ul>
-      </div>
-      <div class="editor-container" id="scene-editor" style="display: none;">
-        <input type="text" id="scene-title" placeholder="ชื่อฉาก..." oninput="saveCurrentScene()">
-        <input type="text" id="scene-summary" placeholder="เป้าหมายของฉาก..." style="font-size: 13px;" oninput="saveCurrentScene()">
-        <textarea id="scene-text" placeholder="เริ่มพิมพ์เนื้อเรื่อง..." oninput="handleEditorInput()"></textarea>
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab-btn active" onclick="switchNav('chapters', this)">บทนิยาย</button>
+        <button class="sidebar-tab-btn" onclick="switchNav('characters', this)">ตัวละคร</button>
+        <button class="sidebar-tab-btn" onclick="switchNav('outline', this)">โครงเรื่อง</button>
       </div>
 
-      <aside class="inspector-panel" id="scene-inspector" style="display: none;">
-        <div class="inspector-header">
-          <span>เครื่องมือตรวจสอบ</span>
-          <button class="btn btn-sm" onclick="runFullAnalysis()">ตรวจซ้ำ</button>
+      <div class="sidebar-content" id="sidebar-chapters">
+        <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px; justify-content: center;" onclick="addChapter()">+ เพิ่มบทใหม่</button>
+        <div id="chapter-list"></div>
+      </div>
+
+      <div class="sidebar-content" id="sidebar-characters" style="display: none;">
+        <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px; justify-content: center;" onclick="addCharacter()">+ เพิ่มตัวละคร</button>
+        <div id="char-list"></div>
+      </div>
+
+      <div class="sidebar-content" id="sidebar-outline" style="display: none; display: flex; flex-direction: column; gap: 14px;">
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">ชื่อเรื่อง</label>
+        <input type="text" id="meta-title" style="padding:10px; font-size:15px;" oninput="saveMeta()">
+        
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">นามปากกา</label>
+        <input type="text" id="meta-author" style="padding:10px; font-size:15px;" oninput="saveMeta()">
+        
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">คำนำนักเขียน</label>
+        <textarea rows="4" id="meta-foreword" style="padding:10px; font-size:14px; line-height:1.6;" oninput="saveMeta()"></textarea>
+
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">เรื่องย่อ (Synopsis)</label>
+        <textarea rows="6" id="meta-synopsis" style="padding:10px; font-size:14px; line-height:1.6;" oninput="saveMeta()"></textarea>
+      </div>
+    </aside>
+
+    <!-- ฝั่งกลาง: พื้นที่เขียนกระดาษตัวใหญ่ -->
+    <main class="main-viewport">
+      <div class="paper-canvas" id="editor-workspace">
+        <div class="chapter-header-box">
+          <input type="text" id="current-ch-title" class="input-title" placeholder="ชื่อบท..." oninput="handleTextChange()">
+          <input type="text" id="current-ch-goal" class="input-goal" placeholder="เป้าหมายของบทนี้..." oninput="handleTextChange()">
         </div>
-        <div class="inspector-body">
-          <div class="issue-group">
-            <div style="font-size:12px; font-weight:bold; margin-bottom:6px;">สถิติฉากนี้</div>
-            <div class="stat-grid">
-              <div class="stat-card"><div class="num" id="stat-words">0</div><div class="lbl">คำ</div></div>
-              <div class="stat-card"><div class="num" id="stat-chars-nospace">0</div><div class="lbl">อักขระ (ไม่รวมวรรค)</div></div>
-            </div>
-          </div>
-          <div class="issue-group">
-            <div style="font-size:12px; font-weight:bold;">พิสูจน์อักษร & คำผิด (<span id="typo-count">0</span>)</div>
-            <div id="typo-list" style="display:flex; flex-direction:column; gap:6px; margin-top:6px;"></div>
-          </div>
-          <div class="issue-group">
-            <div style="font-size:12px; font-weight:bold;">สำนวน AI / แปล (<span id="ai-count">0</span>)</div>
-            <div id="ai-list" style="display:flex; flex-direction:column; gap:6px; margin-top:6px;"></div>
+        <textarea id="current-ch-text" class="writing-editor" placeholder="เริ่มเขียนบรรทัดแรกที่นี่..." oninput="handleTextChange()"></textarea>
+      </div>
+
+      <!-- ฟอร์มตัวละคร -->
+      <div class="paper-canvas" id="character-workspace" style="display: none; padding: 36px; gap: 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 style="font-size: 20px;">โปรไฟล์ตัวละคร</h2>
+          <button class="btn btn-sm" style="color:var(--danger); border-color:var(--danger);" onclick="deleteCharacter()">ลบตัวละครนี้</button>
+        </div>
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">ชื่อตัวละคร</label>
+        <input type="text" id="char-name" style="padding:10px; font-size:16px;" oninput="saveActiveChar()">
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">บทบาท</label>
+        <input type="text" id="char-role" style="padding:10px; font-size:15px;" oninput="saveActiveChar()">
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">เป้าหมาย / แรงจูงใจ (Goal)</label>
+        <input type="text" id="char-goal" style="padding:10px; font-size:15px;" oninput="saveActiveChar()">
+        <label style="font-size:13px; font-weight:600; color:var(--text-muted);">อุปนิสัยและลักษณะเด่น</label>
+        <textarea rows="5" id="char-personality" style="padding:10px; font-size:15px; line-height:1.6;" oninput="saveActiveChar()"></textarea>
+      </div>
+    </main>
+
+    <!-- ฝั่งขวา: เครื่องมือช่วยตรวจ -->
+    <aside class="assistant-drawer" id="right-drawer">
+      <div class="drawer-header">
+        <span>เครื่องมือช่วยเขียน & วิเคราะห์</span>
+        <button class="btn btn-sm" style="border:none; color:var(--text-muted);" onclick="toggleRightDrawer()">✕ ซ่อน</button>
+      </div>
+      <div class="drawer-body">
+        
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:8px;">สถิติบทปัจจุบัน</div>
+          <div class="metric-grid">
+            <div class="metric-card"><div class="metric-val" id="metric-chars">0</div><div class="metric-lbl">อักขระ (ไม่รวมเว้นวรรค)</div></div>
+            <div class="metric-card"><div class="metric-val" id="metric-words">0</div><div class="metric-lbl">จำนวนคำ</div></div>
+            <div class="metric-card"><div class="metric-val" id="metric-read">0 น.</div><div class="metric-lbl">เวลาอ่านประมาณ</div></div>
+            <div class="metric-card"><div class="metric-val" id="metric-lines">0</div><div class="metric-lbl">จำนวนบรรทัด</div></div>
           </div>
         </div>
-      </aside>
-    </section>
 
-    <!-- 4. แท็บจัดรูปเล่มหนังสือ (Book View) -->
-    <section id="view-book" class="view-section">
-      <div class="book-controls">
-        <span>📖 โหมดจำลองรูปเล่มหนังสือ</span>
-        <button class="btn" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF (Ctrl+P)</button>
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:8px;">พิสูจน์อักษร / คำมักผิด (<span id="typo-count">0</span>)</div>
+          <div id="typo-results" style="display:flex; flex-direction:column; gap:6px;"></div>
+        </div>
+
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:8px;">ตรวจจับสำนวนสไตล์ AI (<span id="ai-count">0</span>)</div>
+          <div id="ai-results" style="display:flex; flex-direction:column; gap:6px;"></div>
+        </div>
+
       </div>
-      <div id="book-render-target" style="display:flex; flex-direction:column; gap:24px; align-items:center;">
-        <!-- หน้าต่างๆ จะถูก generate ด้วย JavaScript -->
-      </div>
-    </section>
+    </aside>
 
   </div>
 
+  <!-- โมดัลดูรูปเล่มหนังสือ -->
+  <div class="modal-overlay" id="book-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span style="font-weight:600;">📖 ตัวอย่างรูปเล่มหนังสือพร้อมสั่งพิมพ์</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ สั่งพิมพ์ / บันทึก PDF</button>
+          <button class="btn btn-sm" onclick="closeBookModal()">ปิด</button>
+        </div>
+      </div>
+      <div class="modal-scroll" id="book-print-container"></div>
+    </div>
+  </div>
+
   <script>
-    const TYPO_DICT = [
-      { wrong: "นะค่ะ", right: "นะคะ", reason: "ใช้ 'นะคะ' ในประโยคบอกเล่าหรือลงท้าย" },
-      { wrong: "ลายเซ็นต์", right: "ลายเซ็น", reason: "เขียนแบบไม่มี ต์" },
-      { wrong: "อนุญาติ", right: "อนุญาต", reason: "ไม่มีสระอิ" },
-      { wrong: "ผูกพันธ์", right: "ผูกพัน", reason: "ไม่มี ธ์" }
+    let currentFontSize = 20; // ขนาดเริ่มต้น 20px
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(14, Math.min(32, currentFontSize + delta));
+      document.documentElement.style.setProperty('--editor-font-size', `${currentFontSize}px`);
+      document.getElementById('font-size-display').textContent = `${currentFontSize}px`;
+    }
+
+    // ฟังก์ชันซ่อน/เปิดแถบซ้าย-ขวา
+    function toggleLeftSidebar() {
+      const sb = document.getElementById('left-sidebar');
+      const btn = document.getElementById('btn-open-left');
+      sb.classList.toggle('collapsed');
+      btn.classList.toggle('visible', sb.classList.contains('collapsed'));
+    }
+
+    function toggleRightDrawer() {
+      const drawer = document.getElementById('right-drawer');
+      const btn = document.getElementById('btn-open-right');
+      drawer.classList.toggle('collapsed');
+      btn.classList.toggle('visible', drawer.classList.contains('collapsed'));
+    }
+
+    // โหมดโฟกัสเต็มจอ (ซ่อนทั้งซ้ายและขวา)
+    let isFocusMode = false;
+    function toggleFocusMode() {
+      const sb = document.getElementById('left-sidebar');
+      const drawer = document.getElementById('right-drawer');
+      const btnLeft = document.getElementById('btn-open-left');
+      const btnRight = document.getElementById('btn-open-right');
+      const focusBtn = document.getElementById('btn-focus-mode');
+
+      isFocusMode = !isFocusMode;
+      if (isFocusMode) {
+        sb.classList.add('collapsed');
+        drawer.classList.add('collapsed');
+        btnLeft.classList.add('visible');
+        btnRight.classList.add('visible');
+        focusBtn.textContent = '❌ ออกจากโหมดโฟกัส';
+        focusBtn.classList.add('btn-primary');
+      } else {
+        sb.classList.remove('collapsed');
+        drawer.classList.remove('collapsed');
+        btnLeft.classList.remove('visible');
+        btnRight.classList.remove('visible');
+        focusBtn.textContent = '🎯 โฟกัสเต็มจอ';
+        focusBtn.classList.remove('btn-primary');
+      }
+    }
+
+    const TYPOS = [
+      { wrong: "นะค่ะ", right: "นะคะ" },
+      { wrong: "อนุญาติ", right: "อนุญาต" },
+      { wrong: "ลายเซ็นต์", right: "ลายเซ็น" },
+      { wrong: "ผูกพันธ์", right: "ผูกพัน" },
+      { wrong: "สังเกตุ", right: "สังเกต" }
     ];
 
-    const AI_PATTERNS = [
-      { regex: /ถูก(.{1,10})โดย/g, desc: "โครงสร้าง Passive 'ถูก...โดย...' คล้ายการแปลตรงตัว" },
-      { regex: /มันเป็นเรื่องที่/g, desc: "โครงสร้าง 'มันเป็นเรื่องที่...' ควรตัดออกเพื่อความกระชับ" },
-      { regex: /ในความเป็นจริงแล้ว/g, desc: "สำนวนติดปาก AI (Actually / In fact)" }
+    const AI_STYLES = [
+      { regex: /ถูก(.{1,10})โดย/g, text: "ถูก...โดย... (Passive แปลตรงตัว)" },
+      { regex: /มันเป็นเรื่องที่/g, text: "มันเป็นเรื่องที่... (คำเชื่อมฟุ่มเฟือย)" },
+      { regex: /ในความเป็นจริงแล้ว/g, text: "ในความเป็นจริงแล้ว (สำนวนติดปาก AI)" }
     ];
 
-    let appData = JSON.parse(localStorage.getItem('novel_deluxe_data')) || {
-      treatment: { 
-        title: "ใต้เงาจันทรา", 
-        author: "กวินทร์", 
-        authorNote: "ขอบคุณผู้อ่านทุกท่านที่ร่วมเดินทางไปกับตัวละครในโลกที่เต็มไปด้วยความลับเล่มนี้ หวังว่าเรื่องราวจะสร้างแรงบันดาลใจให้คุณ",
-        premise: "เมื่อความจริงถูกกลืนหายไปในความมืด ทางเลือกเดียวคือเผชิญหน้ากับมัน", 
-        synopsis: "เรื่องราวของนักสืบหนุ่มที่ต้องไขปริศนาคดีโบราณ..." 
-      },
+    let store = JSON.parse(localStorage.getItem('novel_web_data')) || {
+      meta: { title: "ใต้เงาจันทรา", author: "กวินทร์", foreword: "แด่ผู้อ่านทุกท่านที่รักการเดินทางในโลกจินตนาการ", synopsis: "เรื่องราวการไขความลับในเมืองเก่า..." },
       characters: [
-        { id: 1, name: "ธีร์", role: "ตัวเอก", goal: "ตามหาความจริง", personality: "สุขุม ช่างสังเกต" }
+        { id: 1, name: "ธีร์", role: "ตัวเอก", goal: "กอบกู้ชื่อเสียงตระกูล", personality: "สุขุม เงียบขรึม" }
       ],
-      scenes: [
-        { 
-          id: 1, 
-          title: "บทนำ: แสงแรกแห่งรุ่งอรุณ", 
-          goalSummary: "เปิดเรื่องและสร้างบรรยากาศ", 
-          content: "สายหมอกหนาทึบยังคงปกคลุมไปทั่วทั้งหุบเขา เสียงใบไม้เสียดสีดังระงมตามสายลมหนาว ธีร์กระชับเสื้อโค้ตตัวยาวเข้าหาตัวพลางมองตรงไปยังคฤหาสน์เก่าแก่เบื้องหน้า\n\nเขาไม่ได้รับอนุญาตให้เข้ามาที่นี่ แต่เวลาของเขาเหลือน้อยเต็มทีแล้ว ทุกอย่างเริ่มต้นจากจดหมายปิดผนึกสีเลือดฉบับนั้นเพียงฉบับเดียว" 
-        },
-        { 
-          id: 2, 
-          title: "ตอนที่ 1: ประตูกลืนเสียง", 
-          goalSummary: "เข้าไปในคฤหาสน์และพบเบาะแสแรก", 
-          content: "ประตูไม้โอ๊กบานมหึมาแง้มเปิดออกเพียงเล็กน้อย ราวกับเชื้อเชิญผู้มาเยือนเข้าสู่ความเงียบงัน\n\nธีร์ก้าวผ่านธรณีประตูเข้าไปอย่างเงียบเชียบ กลิ่นอับชื้นของกระดาษเก่าและเถ้าถ่านลอยแตะจมูก ที่นี่ไม่มีใครอยู่อาศัยมานานนับสิบปีแล้ว แต่ทำไมบนพื้นหินอ่อนถึงยังมีรอยเท้าใหม่เอี่ยมทอดนำไปสู่บันไดวนชั้นสอง?" 
-        }
+      chapters: [
+        { id: 1, title: "บทนำ: แสงแรกแห่งรุ่งอรุณ", goal: "แนะนำตัวละครหลักและบรรยากาศ", text: "สายหมอกหนาทึบยังคงปกคลุมไปทั่วทั้งหุบเขา ธีร์ก้าวข้ามผ่านประตูรั้วเก่าแก่ด้วยความระมัดระวัง เขาไม่ได้รับอนุญาตให้เข้ามาที่นี่ แต่เวลาเหลือน้อยเต็มทีแล้ว นะค่ะ" }
       ]
     };
 
-    let selectedCharId = appData.characters[0]?.id || null;
-    let selectedSceneId = appData.scenes[0]?.id || null;
+    let activeChapterId = store.chapters[0]?.id || null;
+    let activeCharId = store.characters[0]?.id || null;
 
-    function saveAll() {
-      localStorage.setItem('novel_deluxe_data', JSON.stringify(appData));
+    function saveStore() {
+      localStorage.setItem('novel_web_data', JSON.stringify(store));
     }
 
-    function switchTab(tab) {
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-      document.getElementById(`view-${tab}`).classList.add('active');
-      
-      if (tab === 'book') {
-        renderFullBook();
+    function switchNav(tab, btn) {
+      document.querySelectorAll('.sidebar-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('sidebar-chapters').style.display = tab === 'chapters' ? 'block' : 'none';
+      document.getElementById('sidebar-characters').style.display = tab === 'characters' ? 'block' : 'none';
+      document.getElementById('sidebar-outline').style.display = tab === 'outline' ? 'flex' : 'none';
+
+      const editor = document.getElementById('editor-workspace');
+      const charSpace = document.getElementById('character-workspace');
+      if (tab === 'characters') {
+        editor.style.display = 'none';
+        charSpace.style.display = 'flex';
+        renderCharList();
+      } else {
+        editor.style.display = 'flex';
+        charSpace.style.display = 'none';
       }
     }
 
-    /* จัดการทรีทเมนต์ */
-    function loadTreatment() {
-      document.getElementById('treat-title').value = appData.treatment.title || '';
-      document.getElementById('treat-author').value = appData.treatment.author || '';
-      document.getElementById('treat-author-note').value = appData.treatment.authorNote || '';
-      document.getElementById('treat-premise').value = appData.treatment.premise || '';
-      document.getElementById('treat-synopsis').value = appData.treatment.synopsis || '';
-    }
-    function saveTreatment() {
-      appData.treatment.title = document.getElementById('treat-title').value;
-      appData.treatment.author = document.getElementById('treat-author').value;
-      appData.treatment.authorNote = document.getElementById('treat-author-note').value;
-      appData.treatment.premise = document.getElementById('treat-premise').value;
-      appData.treatment.synopsis = document.getElementById('treat-synopsis').value;
-      saveAll();
-    }
-
-    /* จัดการตัวละคร */
-    function renderCharList() {
-      const list = document.getElementById('char-list');
-      list.innerHTML = '';
-      appData.characters.forEach(c => {
-        const li = document.createElement('li');
-        li.className = `char-item ${c.id === selectedCharId ? 'active' : ''}`;
-        li.textContent = c.name || 'ไม่มีชื่อ';
-        li.onclick = () => { selectedCharId = c.id; renderCharList(); };
-        list.appendChild(li);
+    function renderChapterList() {
+      const container = document.getElementById('chapter-list');
+      container.innerHTML = '';
+      store.chapters.forEach((ch, idx) => {
+        const item = document.createElement('div');
+        item.className = `list-item ${ch.id === activeChapterId ? 'active' : ''}`;
+        item.innerHTML = `<span>ตอนที่ ${idx + 1}: ${ch.title || 'ไม่มีชื่อตอน'}</span>`;
+        item.onclick = () => selectChapter(ch.id);
+        container.appendChild(item);
       });
-      loadCharDetails();
+      loadActiveChapter();
     }
-    function loadCharDetails() {
-      const form = document.getElementById('char-form');
-      const char = appData.characters.find(c => c.id === selectedCharId);
-      if (!char) { form.style.display = 'none'; return; }
-      form.style.display = 'flex';
-      document.getElementById('char-name').value = char.name;
-      document.getElementById('char-role').value = char.role;
-      document.getElementById('char-goal').value = char.goal;
-      document.getElementById('char-personality').value = char.personality;
+
+    function selectChapter(id) {
+      activeChapterId = id;
+      renderChapterList();
     }
-    function saveCurrentChar() {
-      const char = appData.characters.find(c => c.id === selectedCharId);
-      if (char) {
-        char.name = document.getElementById('char-name').value;
-        char.role = document.getElementById('char-role').value;
-        char.goal = document.getElementById('char-goal').value;
-        char.personality = document.getElementById('char-personality').value;
-        saveAll();
-        const active = document.querySelector('.char-item.active');
-        if (active) active.textContent = char.name || 'ไม่มีชื่อ';
+
+    function loadActiveChapter() {
+      const ch = store.chapters.find(c => c.id === activeChapterId);
+      if (!ch) return;
+      document.getElementById('current-ch-title').value = ch.title;
+      document.getElementById('current-ch-goal').value = ch.goal;
+      document.getElementById('current-ch-text').value = ch.text;
+      runAnalysis();
+    }
+
+    function handleTextChange() {
+      const ch = store.chapters.find(c => c.id === activeChapterId);
+      if (ch) {
+        ch.title = document.getElementById('current-ch-title').value;
+        ch.goal = document.getElementById('current-ch-goal').value;
+        ch.text = document.getElementById('current-ch-text').value;
+        saveStore();
+        renderChapterList();
+        runAnalysis();
       }
     }
-    function addCharacter() {
-      const newChar = { id: Date.now(), name: "ตัวละครใหม่", role: "", goal: "", personality: "" };
-      appData.characters.push(newChar);
-      selectedCharId = newChar.id;
+
+    function addChapter() {
+      const newCh = { id: Date.now(), title: `ตอนที่ ${store.chapters.length + 1}`, goal: "", text: "" };
+      store.chapters.push(newCh);
+      activeChapterId = newCh.id;
+      renderChapterList();
+      saveStore();
+    }
+
+    function renderCharList() {
+      const container = document.getElementById('char-list');
+      container.innerHTML = '';
+      store.characters.forEach(c => {
+        const item = document.createElement('div');
+        item.className = `list-item ${c.id === activeCharId ? 'active' : ''}`;
+        item.innerHTML = `<span>${c.name || 'ไม่มีชื่อ'} (${c.role || 'บทบาท'})</span>`;
+        item.onclick = () => selectChar(c.id);
+        container.appendChild(item);
+      });
+      loadActiveChar();
+    }
+
+    function selectChar(id) {
+      activeCharId = id;
       renderCharList();
     }
-    function deleteCharacter() {
-      if (confirm('ต้องการลบตัวละครนี้ใช่หรือไม่?')) {
-        appData.characters = appData.characters.filter(c => c.id !== selectedCharId);
-        selectedCharId = appData.characters[0]?.id || null;
+
+    function loadActiveChar() {
+      const c = store.characters.find(item => item.id === activeCharId);
+      if (!c) return;
+      document.getElementById('char-name').value = c.name;
+      document.getElementById('char-role').value = c.role;
+      document.getElementById('char-goal').value = c.goal;
+      document.getElementById('char-personality').value = c.personality;
+    }
+
+    function saveActiveChar() {
+      const c = store.characters.find(item => item.id === activeCharId);
+      if (c) {
+        c.name = document.getElementById('char-name').value;
+        c.role = document.getElementById('char-role').value;
+        c.goal = document.getElementById('char-goal').value;
+        c.personality = document.getElementById('char-personality').value;
+        saveStore();
         renderCharList();
-        saveAll();
       }
     }
 
-    /* จัดการฉากและตัววิเคราะห์ */
-    function renderSceneList() {
-      const list = document.getElementById('scene-list');
-      list.innerHTML = '';
-      appData.scenes.forEach(s => {
-        const li = document.createElement('li');
-        li.className = `scene-item ${s.id === selectedSceneId ? 'active' : ''}`;
-        li.textContent = s.title || 'ไม่มีชื่อฉาก';
-        li.onclick = () => { selectedSceneId = s.id; renderSceneList(); };
-        list.appendChild(li);
-      });
-      loadSceneDetails();
-    }
-    function loadSceneDetails() {
-      const editor = document.getElementById('scene-editor');
-      const inspector = document.getElementById('scene-inspector');
-      const scene = appData.scenes.find(s => s.id === selectedSceneId);
-      if (!scene) { editor.style.display = 'none'; inspector.style.display = 'none'; return; }
-      editor.style.display = 'flex';
-      inspector.style.display = 'flex';
-      document.getElementById('scene-title').value = scene.title;
-      document.getElementById('scene-summary').value = scene.goalSummary;
-      document.getElementById('scene-text').value = scene.content;
-      runFullAnalysis();
-    }
-    function handleEditorInput() {
-      saveCurrentScene();
-      runFullAnalysis();
-    }
-    function saveCurrentScene() {
-      const scene = appData.scenes.find(s => s.id === selectedSceneId);
-      if (scene) {
-        scene.title = document.getElementById('scene-title').value;
-        scene.goalSummary = document.getElementById('scene-summary').value;
-        scene.content = document.getElementById('scene-text').value;
-        saveAll();
-        const active = document.querySelector('.scene-item.active');
-        if (active) active.textContent = scene.title || 'ไม่มีชื่อฉาก';
-      }
-    }
-    function addScene() {
-      const newScene = { id: Date.now(), title: `ตอนที่ ${appData.scenes.length + 1}`, goalSummary: "", content: "" };
-      appData.scenes.push(newScene);
-      selectedSceneId = newScene.id;
-      renderSceneList();
-    }
-    function replaceWord(wrong, right) {
-      const textarea = document.getElementById('scene-text');
-      textarea.value = textarea.value.replace(new RegExp(wrong, 'g'), right);
-      handleEditorInput();
+    function addCharacter() {
+      const newC = { id: Date.now(), name: "ตัวละครใหม่", role: "", goal: "", personality: "" };
+      store.characters.push(newC);
+      activeCharId = newC.id;
+      renderCharList();
+      saveStore();
     }
 
-    function runFullAnalysis() {
-      const text = document.getElementById('scene-text').value;
+    function deleteCharacter() {
+      if (confirm('ยืนยันลบตัวละครนี้หรือไม่?')) {
+        store.characters = store.characters.filter(c => c.id !== activeCharId);
+        activeCharId = store.characters[0]?.id || null;
+        renderCharList();
+        saveStore();
+      }
+    }
+
+    function loadMeta() {
+      document.getElementById('meta-title').value = store.meta.title;
+      document.getElementById('meta-author').value = store.meta.author;
+      document.getElementById('meta-foreword').value = store.meta.foreword;
+      document.getElementById('meta-synopsis').value = store.meta.synopsis;
+      document.getElementById('top-novel-title').textContent = store.meta.title || 'ไม่มีชื่อเรื่อง';
+    }
+
+    function saveMeta() {
+      store.meta.title = document.getElementById('meta-title').value;
+      store.meta.author = document.getElementById('meta-author').value;
+      store.meta.foreword = document.getElementById('meta-foreword').value;
+      store.meta.synopsis = document.getElementById('meta-synopsis').value;
+      document.getElementById('top-novel-title').textContent = store.meta.title || 'ไม่มีชื่อเรื่อง';
+      saveStore();
+    }
+
+    function runAnalysis() {
+      const text = document.getElementById('current-ch-text').value;
       const charsNoSpace = text.replace(/\s+/g, '').length;
       const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      document.getElementById('stat-chars-nospace').textContent = charsNoSpace.toLocaleString();
-      document.getElementById('stat-words').textContent = words.toLocaleString();
+      const lines = text.split('\n').length;
+      const readMin = Math.ceil(charsNoSpace / 1000) || 1;
 
-      // ตรวจคำผิด
-      const typoList = document.getElementById('typo-list');
-      typoList.innerHTML = '';
+      document.getElementById('metric-chars').textContent = charsNoSpace.toLocaleString();
+      document.getElementById('metric-words').textContent = words.toLocaleString();
+      document.getElementById('metric-lines').textContent = lines.toLocaleString();
+      document.getElementById('metric-read').textContent = (charsNoSpace > 0 ? readMin : 0) + ' น.';
+
+      const typoBox = document.getElementById('typo-results');
+      typoBox.innerHTML = '';
       let typoCount = 0;
-      TYPO_DICT.forEach(item => {
-        if (text.includes(item.wrong)) {
+      TYPOS.forEach(t => {
+        if (text.includes(t.wrong)) {
           typoCount++;
           const card = document.createElement('div');
-          card.className = 'issue-card err';
+          card.className = 'check-card err';
           card.innerHTML = `
-            <div>พบคำผิด: <strong>${item.wrong}</strong> &rarr; <strong>${item.right}</strong></div>
-            <button class="btn btn-sm" style="align-self:flex-start;" onclick="replaceWord('${item.wrong}', '${item.right}')">แก้ทันที</button>
+            <div>พบคำผิด: <strong>${t.wrong}</strong> &rarr; <strong style="color:var(--success);">${t.right}</strong></div>
+            <button class="btn btn-sm" style="align-self:flex-start;" onclick="fixTypo('${t.wrong}', '${t.right}')">แก้ทันที</button>
           `;
-          typoList.appendChild(card);
+          typoBox.appendChild(card);
         }
       });
       document.getElementById('typo-count').textContent = typoCount;
-      if (typoCount === 0) typoList.innerHTML = `<div style="font-size:11px;color:var(--subtext);">ไม่พบคำผิด</div>`;
+      if (typoCount === 0) typoBox.innerHTML = '<div style="font-size:12px;color:var(--text-muted);">ไม่พบคำผิด</div>';
 
-      // ตรวจสำนวน AI
-      const aiList = document.getElementById('ai-list');
-      aiList.innerHTML = '';
+      const aiBox = document.getElementById('ai-results');
+      aiBox.innerHTML = '';
       let aiCount = 0;
-      AI_PATTERNS.forEach(pat => {
-        const matches = text.match(pat.regex);
+      AI_STYLES.forEach(ai => {
+        const matches = text.match(ai.regex);
         if (matches) {
           aiCount += matches.length;
           const card = document.createElement('div');
-          card.className = 'issue-card warn';
-          card.innerHTML = `<div>พบสำนวนแปล: <strong>${matches[0]}</strong></div><div class="desc">${pat.desc}</div>`;
-          aiList.appendChild(card);
+          card.className = 'check-card warn';
+          card.innerHTML = `<div>สำนวนคล้าย AI: <strong>${matches[0]}</strong></div><div style="font-size:11px;color:var(--text-muted);">${ai.text}</div>`;
+          aiBox.appendChild(card);
         }
       });
       document.getElementById('ai-count').textContent = aiCount;
-      if (aiCount === 0) aiList.innerHTML = `<div style="font-size:11px;color:var(--subtext);">สำนวนเป็นธรรมชาติ</div>`;
+      if (aiCount === 0) aiBox.innerHTML = '<div style="font-size:12px;color:var(--text-muted);">สำนวนเป็นธรรมชาติ</div>';
     }
 
-    /* ===================================================
-       เรนเดอร์รูปเล่มหนังสือ (Book Typesetting Layout Engine)
-       =================================================== */
-    function renderFullBook() {
-      const target = document.getElementById('book-render-target');
-      target.innerHTML = '';
+    function fixTypo(wrong, right) {
+      const textarea = document.getElementById('current-ch-text');
+      textarea.value = textarea.value.replace(new RegExp(wrong, 'g'), right);
+      handleTextChange();
+    }
 
-      const title = appData.treatment.title || 'ไม่มีชื่อเรื่อง';
-      const author = appData.treatment.author || 'ไม่ระบุนามปากกา';
-      const authorNote = appData.treatment.authorNote || 'ขอขอบคุณนักอ่านทุกท่านที่สนับสนุน';
-      const premise = appData.treatment.premise || '';
+    function openBookModal() {
+      const container = document.getElementById('book-print-container');
+      container.innerHTML = '';
 
-      // 1. หน้าปก (Cover Page)
-      const coverPage = document.createElement('div');
-      coverPage.className = 'book-page book-cover';
-      coverPage.innerHTML = `
-        <h1>${title}</h1>
-        <div class="premise-tag">${premise}</div>
-        <div class="author-tag">${author}</div>
+      const cover = document.createElement('div');
+      cover.className = 'print-page';
+      cover.style.display = 'flex';
+      cover.style.flexDirection = 'column';
+      cover.style.justifyContent = 'center';
+      cover.style.alignItems = 'center';
+      cover.style.textAlign = 'center';
+      cover.innerHTML = `
+        <h1 style="font-size: 26pt; margin-bottom: 20px;">${store.meta.title}</h1>
+        <p style="font-size: 15pt; color:#475569;">โดย ${store.meta.author}</p>
       `;
-      target.appendChild(coverPage);
+      container.appendChild(cover);
 
-      // 2. หน้ารอง & หน้าลิขสิทธิ์ (Half-Title & Imprint Page)
-      const imprintPage = document.createElement('div');
-      imprintPage.className = 'book-page book-halftitle';
-      imprintPage.innerHTML = `
-        <div style="margin-top: 40mm;">
-          <h2 style="font-size: 18pt; letter-spacing: 2px;">${title}</h2>
-          <p style="margin-top: 10px; color: #64748b;">${author}</p>
-        </div>
-        <div class="book-copyright-footer">
-          <p><strong>${title}</strong></p>
-          <p>สงวนลิขสิทธิ์ตามพระราชบัญญัติลิขสิทธิ์</p>
-          <p>ผู้ประพันธ์: ${author}</p>
-          <p>จัดรูปเล่มอัตโนมัติด้วยระบบ Writer Studio</p>
-          <p>พิมพ์ครั้งที่ 1 : พ.ศ. 2569</p>
-        </div>
+      const foreword = document.createElement('div');
+      foreword.className = 'print-page';
+      foreword.innerHTML = `
+        <h2 style="text-align:center; font-size:18pt; margin-bottom:30px;">คำนำ</h2>
+        <p style="text-indent: 1.5cm; text-align:justify;">${store.meta.foreword.replace(/\n/g, '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')}</p>
+        <p style="text-align:right; margin-top:40px;">— ${store.meta.author}</p>
       `;
-      target.appendChild(imprintPage);
+      container.appendChild(foreword);
 
-      // 3. หน้าเกี่ยวกับนักเขียน / คำนำ (About Author / Foreword)
-      const authorPage = document.createElement('div');
-      authorPage.className = 'book-page';
-      authorPage.innerHTML = `
-        <div class="book-author-title">คำนำนักเขียน</div>
-        <div class="book-paragraph">${authorNote.replace(/\n/g, '<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')}</div>
-        <div style="margin-top: 30px; text-align: right; font-style: italic;">— ${author}</div>
-      `;
-      target.appendChild(authorPage);
-
-      // 4. สารบัญ (Table of Contents)
-      const tocPage = document.createElement('div');
-      tocPage.className = 'book-page';
-      let tocHtml = `<div class="book-toc-title">สารบัญ</div><div style="margin-top: 20px;">`;
-      appData.scenes.forEach((scene, idx) => {
+      const toc = document.createElement('div');
+      toc.className = 'print-page';
+      let tocHtml = `<h2 style="text-align:center; font-size:18pt; margin-bottom:30px;">สารบัญ</h2>`;
+      store.chapters.forEach((ch, i) => {
         tocHtml += `
-          <div class="book-toc-item">
-            <span>บทที่ ${idx + 1}: ${scene.title || 'ไม่มีชื่อตอน'}</span>
-            <span>บทที่ ${idx + 1}</span>
-          </div>
-        `;
+          <div style="display:flex; justify-content:space-between; border-bottom:1px dotted #ccc; padding:6px 0;">
+            <span>บทที่ ${i + 1}: ${ch.title}</span>
+            <span>บทที่ ${i + 1}</span>
+          </div>`;
       });
-      tocHtml += `</div><div style="margin-top: auto; font-size: 11pt; color: #64748b; text-align: center;">รวมทั้งสิ้น ${appData.scenes.length} บท</div>`;
-      tocPage.innerHTML = tocHtml;
-      target.appendChild(tocPage);
+      toc.innerHTML = tocHtml;
+      container.appendChild(toc);
 
-      // 5. หน้าเนื้อหาแต่ละบท (Book Chapters)
-      appData.scenes.forEach((scene, idx) => {
-        const chapterPage = document.createElement('div');
-        chapterPage.className = 'book-page';
-
-        const paragraphs = scene.content.split('\n\n').filter(p => p.trim() !== '');
-        let contentHtml = `<div class="book-chapter-title">${scene.title || 'บทที่ ' + (idx + 1)}</div>`;
-        
-        if (paragraphs.length > 0) {
-          paragraphs.forEach(p => {
-            contentHtml += `<div class="book-paragraph">${p.trim().replace(/\n/g, '<br>')}</div>`;
-          });
-        } else {
-          contentHtml += `<div class="book-paragraph" style="color: #94a3b8; font-style: italic; text-align: center;">(ยังไม่มีเนื้อหาในตอนนี้)</div>`;
-        }
-
-        chapterPage.innerHTML = contentHtml;
-        target.appendChild(chapterPage);
+      store.chapters.forEach((ch, i) => {
+        const page = document.createElement('div');
+        page.className = 'print-page';
+        const pars = ch.text.split('\n\n').filter(p => p.trim() !== '');
+        let pHtml = `<h2 style="text-align:center; font-size:18pt; margin-bottom:25px;">${ch.title}</h2>`;
+        pars.forEach(p => {
+          pHtml += `<p style="text-indent: 1.5cm; margin-bottom: 10px; text-align:justify;">${p.replace(/\n/g, '<br>')}</p>`;
+        });
+        page.innerHTML = pHtml;
+        container.appendChild(page);
       });
+
+      document.getElementById('book-modal').style.display = 'flex';
     }
 
-    function exportBackup() {
-      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `novel_deluxe_backup_${Date.now()}.json`;
-      a.click();
+    function closeBookModal() {
+      document.getElementById('book-modal').style.display = 'none';
     }
 
-    // เริ่มระบบ
-    loadTreatment();
-    renderCharList();
-    renderSceneList();
+    loadMeta();
+    renderChapterList();
   </script>
 </body>
 </html>
